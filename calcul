@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нәтиже балл калькуляторы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f4f4f4; /* Жеңіл сұр фон */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f8f8f8;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #bbb;
+            background-color: #fff;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #6c757d; /* Қара сұр түсі */
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #5a6368; /* Біршама қоюлау түс */
+            transform: translateY(-2px);
+        }
+
+        .result {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Жартылай мөлдір қара фон */
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            flex-direction: column;
+            transition: opacity 0.5s ease-in-out;
+            cursor: pointer; /* Басу үшін көрсету */
+        }
+
+        .result.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .result p {
+            margin: 20px 0;
+        }
+
+        .card {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef; /* Жеңіл сұр карточка */
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Нәтиже балл калькуляторы</h1>
+
+        <form id="scoreForm">
+            <label for="srTek">Орташа ағымдағы балл (ср. тек):</label>
+            <input type="number" id="srTek" step="0.01" required>
+
+            <label for="rk1">Бірінші кезең бақылауы (рк1):</label>
+            <input type="number" id="rk1" step="0.01" required>
+
+            <label for="rk2">Екінші кезең бақылауы (рк2):</label>
+            <input type="number" id="rk2" step="0.01" required>
+
+            <label for="exam">Экзаменнен балл:</label>
+            <input type="number" id="exam" step="0.01" required>
+
+            <button type="button" onclick="calculateScore()">Есептеу</button>
+        </form>
+
+        <div class="card">
+            <h2>Қалай жұмыс істейді?</h2>
+            <p>Озық бағаларды енгізіп, жалпы балды есептеңіз. Баллдар былай бөлінеді:</p>
+            <ul>
+                <li>Орташа ағымдағы балл (40%)</li>
+                <li>Бақылау кезеңдері (20%)</li>
+                <li>Экзамен (40%)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="result" class="result" onclick="resetForm()">
+        <p>Жалпы балл:</p>
+        <p id="finalScore"></p>
+        <p>Деректерді қайта енгізу үшін кез келген жерді басыңыз</p>
+    </div>
+
+    <script>
+        function calculateScore() {
+            const srTek = parseFloat(document.getElementById("srTek").value);
+            const rk1 = parseFloat(document.getElementById("rk1").value);
+            const rk2 = parseFloat(document.getElementById("rk2").value);
+            const exam = parseFloat(document.getElementById("exam").value);
+
+            if (isNaN(srTek) || isNaN(rk1) || isNaN(rk2) || isNaN(exam)) {
+                alert("Барлық деректерді дұрыс енгізіңіз!");
+                return;
+            }
+
+            const part1 = srTek * 0.4;
+            const part2 = ((rk1 + rk2) / 2) * 0.2;
+            const part3 = exam * 0.4;
+            const finalScore = part1 + part2 + part3;
+
+            const resultDiv = document.getElementById("result");
+            const finalScoreText = document.getElementById("finalScore");
+
+            resultDiv.classList.add("show");
+            finalScoreText.textContent = finalScore.toFixed(2);
+        }
+
+        function resetForm() {
+            // Нәтижені жасыру
+            const resultDiv = document.getElementById("result");
+            resultDiv.classList.remove("show");
+
+            // Форманы тазарту
+            document.getElementById("srTek").value = '';
+            document.getElementById("rk1").value = '';
+            document.getElementById("rk2").value = '';
+            document.getElementById("exam").value = '';
+
+            // Алғашқы енгізу өрісіне фокус
+            document.getElementById("srTek").focus();
+        }
+    </script>
+
+</body>
+</html>
